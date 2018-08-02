@@ -13,7 +13,9 @@ class AuthorController {
             return
         }
 
-        def existingAuthor = Author.findByName(name)
+        // Pessimistic locking here, so we should be able to handle concurrency, right?
+        // according to http://gorm.grails.org/6.1.x/hibernate/manual/#locking I would think this should make our test pass
+        def existingAuthor = Author.findByName(name, [lock: true])
         if (!existingAuthor) {
             response.sendError 422, "Author not found with name $name"
             return
